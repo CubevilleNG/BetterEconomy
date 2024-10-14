@@ -131,7 +131,7 @@ public interface MainConfig {
         format.setMinimumFractionDigits(0);
         format.setMaximumFractionDigits(scale);
         format.setDecimalFormatSymbols(symbols);
-        return format.format(amount);
+        return format.format(amount) + getCurrencySymbol();
     }
 
     default char getActualDecimalPoint() {
