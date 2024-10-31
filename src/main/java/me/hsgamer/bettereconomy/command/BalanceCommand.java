@@ -29,9 +29,11 @@ public class BalanceCommand extends Command {
         if (!testPermission(sender)) {
             return false;
         }
+        boolean otherPlayer = false;
         UUID uuid;
         if (args.length > 0 && sender.hasPermission(Permissions.BALANCE_OTHERS)) {
             uuid = Utils.getUniqueId(args[0]);
+            otherPlayer = true;
         } else if (sender instanceof Player) {
             uuid = ((Player) sender).getUniqueId();
         } else {
@@ -42,7 +44,8 @@ public class BalanceCommand extends Command {
             MessageUtils.sendMessage(sender, instance.get(MessageConfig.class).getPlayerNotFound());
             return false;
         }
-        MessageUtils.sendMessage(sender, instance.get(MessageConfig.class).getBalanceOutput().replace("{balance}", instance.get(MainConfig.class).format(instance.get(EconomyHandlerProvider.class).getEconomyHandler().get(uuid))));
+        String str = "&a" + (otherPlayer ? args[0] + " owns " : "You own ");
+        MessageUtils.sendMessage(sender, str + instance.get(MessageConfig.class).getBalanceOutput().replace("{balance}", instance.get(MainConfig.class).format(instance.get(EconomyHandlerProvider.class).getEconomyHandler().get(uuid))));
         return true;
     }
 }
