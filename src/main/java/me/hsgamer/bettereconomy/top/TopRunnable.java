@@ -9,6 +9,7 @@ import me.hsgamer.bettereconomy.api.EconomyHandler;
 import me.hsgamer.bettereconomy.config.MainConfig;
 import me.hsgamer.bettereconomy.provider.EconomyHandlerProvider;
 import org.bukkit.Bukkit;
+import org.cubeville.cveconomy.bank.Bank;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,8 +22,11 @@ public class TopRunnable implements Runnable, Loadable {
     private final AtomicReference<Map<UUID, Integer>> topIndex = new AtomicReference<>(Collections.emptyMap());
     private Task task;
 
+    private Bank bank = null;
+
     public TopRunnable(BetterEconomy instance) {
         this.instance = instance;
+        if(instance.getServer().getPluginManager().getPlugin("CVEconomy") != null) bank = Bank.getBank();
     }
 
     @Override
@@ -32,7 +36,12 @@ public class TopRunnable implements Runnable, Loadable {
                 .parallel()
                 .map(Utils::getUniqueId)
                 .filter(economyHandler::hasAccount)
-                .map(uuid -> new PlayerBalanceSnapshot(uuid, economyHandler.get(uuid)))
+                .map(uuid -> {
+                    double balance = economyHandler.get(uuid);
+                    double bank = 0;
+                    if(this.bank != null && this.bank.getVisibility(uuid)) bank = this.bank.getBalance(uuid).doubleValue();
+                    return new PlayerBalanceSnapshot(uuid, balance + bank);
+                })
                 .sorted(Comparator.comparingDouble(PlayerBalanceSnapshot::getBalance).reversed())
                 .collect(Collectors.toList());
         topList.lazySet(list);

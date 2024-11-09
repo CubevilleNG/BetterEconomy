@@ -11,7 +11,6 @@ import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.cubeville.cveconomy.bank.Bank;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -20,13 +19,11 @@ import java.util.Optional;
 
 public class BalanceTopCommand extends Command {
     private final BetterEconomy instance;
-    private Bank bank = null;
 
     public BalanceTopCommand(BetterEconomy instance) {
         super("balancetop", "Show the balance top", "/balancetop [page]", Collections.singletonList("baltop"));
         this.instance = instance;
         setPermission(Permissions.BALANCE_TOP.getName());
-        if(instance.getServer().getPluginManager().getPlugin("CVEconomy") != null) bank = Bank.getBank();
     }
 
     @Override
@@ -52,14 +49,12 @@ public class BalanceTopCommand extends Command {
         for (int index = startIndex; index < endIndex; index++) {
             PlayerBalanceSnapshot snapshot = list.get(index);
             OfflinePlayer offlinePlayer = Utils.getOfflinePlayer(snapshot.getUuid());
-            double bankBalance = 0;
-            if(bank != null && bank.getVisibility(snapshot.getUuid())) bankBalance = bank.getBalance(snapshot.getUuid()).doubleValue();
             MessageUtils.sendMessage(
                     sender,
                     instance.get(MessageConfig.class).getBalanceTopOutput()
                             .replace("{place}", Integer.toString(index + 1))
                             .replace("{name}", Optional.ofNullable(offlinePlayer.getName()).orElse(Utils.getUniqueId(offlinePlayer).toString()))
-                            .replace("{balance}", instance.get(MainConfig.class).format(snapshot.getBalance() + bankBalance))
+                            .replace("{balance}", instance.get(MainConfig.class).format(snapshot.getBalance()))
             );
         }
         return true;
