@@ -6,6 +6,7 @@ softdepend:
   - Vault
   - Treasury
   - PlaceholderAPI
+  - CVEconomy
 authors:
   - HSGamer
   - takahatashun
